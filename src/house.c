@@ -77,19 +77,19 @@ void houseInit(void)
         { "Living", "Kitchen", "Bedroom", "Bathroom", "Hall", "Garage" };
     static const uint16_t SEED_ADC[ROOM_COUNT] = { 51U, 64U, 45U, 58U, 49U, 96U };
     static const uint8_t  SEED_OCC[ROOM_COUNT] = { 1U, 0U, 0U, 0U, 1U, 0U };
-     for (uint8_t i = 0; i < ROOM_COUNT; i++)
-     {  
-        strncpy(house[i].name, NAMES[i], NAME_LEN - 1);
-        house[i].name[NAME_LEN - 1] = '\0';
-        house[i].adc = SEED_ADC[i];
-        house[i].status = 0U;
-        SET_BIT(house[i].status, BIT_AUTO);
-        if (SEED_OCC[i])
-        {
-            SET_BIT(house[i].status, BIT_OCCUPIED);
-        }
-     }
-     
+    
+ for (uint8_t i = 0U; i < ROOM_COUNT; i++)
+{
+    strncpy(house[i].name, NAMES[i], NAME_LEN - 1);
+    house[i].name[NAME_LEN - 1] = '\0';
+    house[i].adc = SEED_ADC[i];
+    house[i].status = 0U;
+    SET_BIT(house[i].status, BIT_AUTO);
+    if (SEED_OCC[i])
+    {
+        SET_BIT(house[i].status, BIT_OCCUPIED);
+    }
+}
 }
 
 
@@ -119,9 +119,11 @@ void houseInit(void)
  */
 uint16_t tempC(uint16_t adc)
 {
-    (void)adc;      /* delete this line */
-    return 0U;      /* TODO */
+uint32_t temp = (uint32_t)adc * 500U;
+    return (uint16_t)(temp / 1024U);
 }
+   
+
 
 
 /* ==========================================================================
@@ -163,8 +165,42 @@ uint16_t tempC(uint16_t adc)
  */
 uint8_t applyRules(Room_t *r)
 {
-    (void)r;        /* delete this line */
-    return 0U;      /* TODO */
+    uint8_t old_status = r->status;
+
+    if (!READ_BIT(r->status, BIT_AUTO))
+    {
+       return 0U; 
+
+    }
+    else {
+        uint16_t temperature = tempC(r->adc);
+        if (READ_BIT(r->status, BIT_OCCUPIED))
+        {
+            SET_BIT(r->status, BIT_LAMP);
+        }
+        else
+        {
+            CLR_BIT(r->status, BIT_LAMP);
+        }
+        if (temperature >= TEMP_HOT)
+        {
+            SET_BIT(r->status, BIT_FAN);
+        }
+        else
+        {
+            CLR_BIT(r->status, BIT_FAN);
+        }
+        if( temperature >= TEMP_ALARM)
+        {
+            SET_BIT(r->status, BIT_ALARM);
+            SET_BIT(r->status, BIT_LAMP);
+        }
+        else
+        {
+            CLR_BIT(r->status, BIT_ALARM);
+        }
+    }
+return (r->status != old_status) ? 1U : 0U;
 }
 
 
@@ -189,7 +225,14 @@ uint8_t applyRules(Room_t *r)
  */
 uint8_t rulesPass(void)
 {
-    return 0U;      /* TODO */
+    uint8_t changed_count = 0U;
+
+    for (uint8_t i = 0U; i < ROOM_COUNT; i++)
+    {
+        changed_count += applyRules(&house[i]);
+    }
+
+    return changed_count;
 }
 
 
