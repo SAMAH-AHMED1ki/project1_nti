@@ -142,7 +142,26 @@ uint8_t pickRoom(void)
  */
 void setOccupancy(void)
 {
-    printf("  TODO setOccupancy\n");
+    uint8_t i = pickRoom();
+    if (i == 255U)
+    {
+        return;
+    }
+    
+    Room_t *room = houseRoom(i);
+    TOGGLE_BIT(room->status, BIT_OCCUPIED);
+    
+    if (READ_BIT(room->status, BIT_OCCUPIED))
+    {
+        statusSet(C_OK, "Someone entered the %s.", room->name);
+    }
+    else
+    {
+        statusSet(C_OK, "Someone left the %s.", room->name);
+    }
+    
+    render((int)i);
+    pauseKey();
 }
 
 
@@ -173,7 +192,30 @@ void setOccupancy(void)
  */
 void setTemperature(void)
 {
-    printf("  TODO setTemperature\n");
+   uint8_t i = pickRoom();
+    if (i == 255U)
+    {
+        return;
+    }
+
+    statusSet(C_DIM, "Raw ADC reading (0..1023): ");
+    int raw ;
+    if (!readInt(&raw))
+{
+    return;
+}
+    if (raw < 0 || raw > (int)ADC_MAX)
+    {
+        statusSet(C_ALARM, "Invalid ADC reading");
+        return;
+    }
+
+    Room_t *room = houseRoom(i);
+    room->adc = (uint16_t)raw;
+
+    statusSet(C_OK, "%s: ADC %u -> %u C", room->name, room->adc, tempC(room->adc));
+    render((int)i);
+    pauseKey();
 }
 
 
