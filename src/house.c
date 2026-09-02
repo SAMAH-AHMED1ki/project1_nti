@@ -29,7 +29,7 @@
  * Student: <Samah Ahmed Mahmoud Ahmed>
  */
 #include "house.h"
-
+#include <string.h>
 /* ---------------- module-private data (NFR-03) ---------------
  * GIVEN. The array is static, so nothing outside this file can reach it.
  * Callers go through houseRoom() / houseRooms() below. Leave it that way —
@@ -90,7 +90,6 @@ void houseInit(void)
         }
      }
      
-    /* TODO: the loop described above. */
 }
 
 
