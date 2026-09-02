@@ -250,8 +250,21 @@ uint8_t rulesPass(void)
  */
 uint8_t countRoomsWith(uint8_t bit)
 {
-    (void)bit;      /* delete this line */
-    return 0U;      /* TODO */
+    uint8_t count = 0U;
+
+    for (uint8_t i = 0U; i < ROOM_COUNT; i++)
+    {
+        if (READ_BIT(house[i].status, bit))
+        {
+            count++;
+        }
+        else
+        {
+            /* do nothing */
+        }
+    }
+
+    return count;
 }
 
 
@@ -280,6 +293,12 @@ uint8_t countRoomsWith(uint8_t bit)
  */
 uint32_t sumAdc(const Room_t *rooms, uint8_t n)
 {
-    (void)rooms; (void)n;   /* delete this line */
-    return 0UL;             /* TODO */
+    if (n == 0U)
+    {
+        return 0U;
+    }
+    else
+    {
+        return rooms[n - 1].adc + sumAdc(rooms, n - 1);
+    }
 }
