@@ -424,12 +424,12 @@ void runAutomation(void)
 
             if (res > 0)
             {
-                snprintf(trace[i], sizeof(trace[i]), "%s %d C   0b%08b -> 0b%08b   *", 
-                         room->name, t, before, after);
+               snprintf(trace[i], sizeof(trace[i]), "%s %d C   %u -> %u   *",
+                           room->name, t, before, after);
             }
             else
             {
-                snprintf(trace[i], sizeof(trace[i]), "%s %d C   0b%08b -> 0b%08b", 
+                snprintf(trace[i], sizeof(trace[i]), "%s %d C   %u -> %u",
                          room->name, t, before, after);
             }
         }
